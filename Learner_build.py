@@ -33,13 +33,16 @@ model = nn.Sequential(
 )
 
 learn = Learner(data_folder, model, metrics=[accuracy])
-clbk = [  # callbacks.EarlyStoppingCallback(learn), # 如果给定的指标/验证损失没有改善，则停止训练
+clbk = [
+    # callbacks.EarlyStoppingCallback(learn), # 如果给定的指标/验证损失没有改善，则停止训练
     # callbacks.LRFinder(learn),
     callbacks.MixedPrecision(learn),  # 使用半精度浮点数，使GPU处理更加快速
     callbacks.SaveModelCallback(learn)  # 保存验证损失的最佳模型
 ]
+learn.lr_find()
+learn.recorder.plot()
+plt.show()
 learn.callbacks = clbk
-learn.lr_find(start_lr=1e-07, end_lr=10)
 learn.fit(3, 1e-2)
 learn.unfreeze()
 learn.fit_one_cycle(3)
